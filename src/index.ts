@@ -13,7 +13,10 @@ import debug from "debug";
 import dotenv from "dotenv";
 
 // eslint-disable-next-line import/no-named-as-default-member
-dotenv.config();
+const dotenvResult = dotenv.config();
+if (dotenvResult.error) {
+  throw dotenvResult.error;
+}
 
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
@@ -28,7 +31,11 @@ app.use(cors());
 
 app.use(
   expressWinston.logger({
-    transports: [new winston.transports.Console()],
+    level: "debug",
+    transports: [
+      new winston.transports.Console(),
+      new winston.transports.File({ filename: "log.log" }),
+    ],
     format: winston.format.combine(
       winston.format.json(),
       winston.format.prettyPrint(),
